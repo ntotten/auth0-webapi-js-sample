@@ -11,8 +11,16 @@
 
     <h2>My single page app</h2>
 
-<script src="https://sdk.auth0.com/auth0.js#client=@System.Configuration.ConfigurationManager.AppSettings["AUTH0_CLIENT_ID"]&amp;scope=openid&amp;response_type=token"></script>
-<button onclick="window.Auth0.signIn({onestep: true})">Login</button>
+<script src="https://d19p4zemcycm7a.cloudfront.net/w2/auth0-widget-1.1.1.min.js"></script>
+<script type="text/javascript">
+    var widget = new Auth0Widget({
+        domain:         'REPLACE_WITH_YOUR_AUTH0_DOMAIN', // e.g.: contoso.auth0.com
+        clientID:       '@System.Configuration.ConfigurationManager.AppSettings["AUTH0_CLIENT_ID"]',
+        callbackURL:    'REPLACE_WITH_YOUR_APP_CALLBACK', // e.g.: http://localhost:some_random_port
+        callbackOnLocationHash: true
+    });
+</script>
+<button onclick="widget.show()">Login</button>
 
 <br />
 <button id="get-customers">Get Customers</button>
@@ -24,51 +32,33 @@
 <pre><code id="userinfo">Not logged in yet</code></pre>
 
 <script src="~/Scripts/jquery-1.9.1.js" type="text/javascript"></script>
-
 <script type="text/javascript">
     $(function () {
-        var access_token = /access_token=([^&]*)/g.exec(window.location.hash);
-        if (access_token) {
-            $.ajax({
-                url: 'https://api.auth0.com/userinfo?access_token=' + access_token[1],
-                dataType: 'json',
-                success: function (data, status, jqHXR) {
-                    $('#userinfo').text(JSON.stringify(data, 0, 2));
-                },
-                error: function (resp) {
-                    if (resp.status == 401) {
-                        $('#userinfo').text('Unauthorized');
-                    } else {
-                        $('#userinfo').text('Error');
-                    }
+        widget.parseHash(window.location.hash, function (profile, id_token, access_token, state) {
+            $('#userinfo').text(JSON.stringify(profile, 0, 2));
 
-                }
-            });
-        }
+            $('#get-customers').on('click', function () {
+                $.ajax({
+                    url: '/api/customers',
+                    dataType: 'json',
+                    beforeSend: function (request) {
+                        if (id_token) request.setRequestHeader("Authorization", "Bearer " + id_token);
+                    },
+                    success: function (data, status, jqHXR) {
+                        $('#customers').text(JSON.stringify(data));
+                    },
+                    error: function (resp) {
+                        if (resp.status == 401) {
+                            $('#customers').text('Unauthorized');
+                        } else {
+                            $('#customers').text('Error');
+                        }
 
-        var id_token = /id_token=([^&]*)/g.exec(window.location.hash);
-        $('#get-customers').on('click', function () {
-            $.ajax({
-                url: '/api/customers',
-                dataType: 'json',
-                beforeSend: function (request) {
-                    if (id_token) request.setRequestHeader("Authorization", "Bearer " + id_token[1]);
-                },
-                success: function (data, status, jqHXR) {
-                    $('#customers').text(JSON.stringify(data));
-                },
-                error: function (resp) {
-                    if (resp.status == 401) {
-                        $('#customers').text('Unauthorized');
-                    } else {
-                        $('#customers').text('Error');
                     }
-                    
-                }
+                });
             });
         });
     });
 </script>
 </body>
 </html>
-
