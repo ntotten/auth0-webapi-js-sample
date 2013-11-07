@@ -38,6 +38,7 @@
             $('#userinfo').text(JSON.stringify(profile, 0, 2));
 
             $('#get-customers').on('click', function () {
+                $('#customers').text('Loading...');
                 $.ajax({
                     url: '/api/customers',
                     dataType: 'json',
