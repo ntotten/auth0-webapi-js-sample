@@ -11,7 +11,7 @@ namespace WebApi
             {
                 Audience = ConfigurationManager.AppSettings["AUTH0_CLIENT_ID"],
                 SymmetricKey = ConfigurationManager.AppSettings["AUTH0_CLIENT_SECRET"]
-            });   
+            });
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
@@ -20,6 +20,4 @@ namespace WebApi
             );
         }
     }
-
-    
 }
