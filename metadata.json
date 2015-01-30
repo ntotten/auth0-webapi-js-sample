@@ -1,0 +1,13 @@
+{
+  "name": "ASP.NET Web API + SPA App",
+  "type": "sample",
+  "tags": [
+    "aspnet-webapi",
+    "dotnet",
+    "csharp"
+    "web",
+    "api",
+    "javascript",
+    "single-page-app"
+  ]
+}
